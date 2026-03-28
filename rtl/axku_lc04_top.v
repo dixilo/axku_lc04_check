@@ -10,6 +10,12 @@ module axku_lc04_top (
 );
 
     wire clk_200;
+    wire iic_scl_i;
+    wire iic_scl_o;
+    wire iic_scl_t;
+    wire iic_sda_i;
+    wire iic_sda_o;
+    wire iic_sda_t;
 
     (* mark_debug = "true" *) wire [5:0]  dbg_fsm_state;
     (* mark_debug = "true" *) wire [4:0]  dbg_bit_state;
@@ -30,11 +36,29 @@ module axku_lc04_top (
         .O(clk_200)
     );
 
+    IOBUF u_iobuf_scl (
+        .I(iic_scl_o),
+        .IO(iic_scl),
+        .O(iic_scl_i),
+        .T(iic_scl_t)
+    );
+
+    IOBUF u_iobuf_sda (
+        .I(iic_sda_o),
+        .IO(iic_sda),
+        .O(iic_sda_i),
+        .T(iic_sda_t)
+    );
+
     mb_i2c_system_wrapper u_system (
         .clk_200(clk_200),
         .ext_resetn(ext_resetn),
-        .iic_scl(iic_scl),
-        .iic_sda(iic_sda),
+        .iic_scl_i(iic_scl_i),
+        .iic_scl_o(iic_scl_o),
+        .iic_scl_t(iic_scl_t),
+        .iic_sda_i(iic_sda_i),
+        .iic_sda_o(iic_sda_o),
+        .iic_sda_t(iic_sda_t),
         .user_led(user_led),
         .dbg_fsm_state(dbg_fsm_state),
         .dbg_bit_state(dbg_bit_state),

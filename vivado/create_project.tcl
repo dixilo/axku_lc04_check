@@ -23,8 +23,12 @@ create_bd_design $bd_name
 create_bd_port -dir I -type clk clk_200
 set_property CONFIG.FREQ_HZ 200000000 [get_bd_ports clk_200]
 create_bd_port -dir I ext_resetn
-create_bd_port -dir IO iic_scl
-create_bd_port -dir IO iic_sda
+create_bd_port -dir I iic_scl_i
+create_bd_port -dir O iic_scl_o
+create_bd_port -dir O iic_scl_t
+create_bd_port -dir I iic_sda_i
+create_bd_port -dir O iic_sda_o
+create_bd_port -dir O iic_sda_t
 create_bd_port -dir O -from 3 -to 0 user_led
 create_bd_port -dir O -from 5 -to 0  dbg_fsm_state
 create_bd_port -dir O -from 4 -to 0  dbg_bit_state
@@ -108,8 +112,12 @@ connect_bd_intf_net [get_bd_intf_pins mdm_0/MBDEBUG_0] [get_bd_intf_pins microbl
 
 assign_bd_address
 
-connect_bd_net [get_bd_ports iic_scl] [get_bd_pins axi_i2c_eeprom_ctrl_0/iic_scl]
-connect_bd_net [get_bd_ports iic_sda] [get_bd_pins axi_i2c_eeprom_ctrl_0/iic_sda]
+connect_bd_net [get_bd_ports iic_scl_i] [get_bd_pins axi_i2c_eeprom_ctrl_0/iic_scl_i]
+connect_bd_net [get_bd_ports iic_scl_o] [get_bd_pins axi_i2c_eeprom_ctrl_0/iic_scl_o]
+connect_bd_net [get_bd_ports iic_scl_t] [get_bd_pins axi_i2c_eeprom_ctrl_0/iic_scl_t]
+connect_bd_net [get_bd_ports iic_sda_i] [get_bd_pins axi_i2c_eeprom_ctrl_0/iic_sda_i]
+connect_bd_net [get_bd_ports iic_sda_o] [get_bd_pins axi_i2c_eeprom_ctrl_0/iic_sda_o]
+connect_bd_net [get_bd_ports iic_sda_t] [get_bd_pins axi_i2c_eeprom_ctrl_0/iic_sda_t]
 connect_bd_net [get_bd_ports user_led] [get_bd_pins axi_i2c_eeprom_ctrl_0/user_led]
 connect_bd_net [get_bd_ports dbg_fsm_state] [get_bd_pins axi_i2c_eeprom_ctrl_0/dbg_fsm_state]
 connect_bd_net [get_bd_ports dbg_bit_state] [get_bd_pins axi_i2c_eeprom_ctrl_0/dbg_bit_state]

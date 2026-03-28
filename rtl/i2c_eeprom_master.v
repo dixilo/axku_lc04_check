@@ -13,8 +13,10 @@ module i2c_eeprom_master #(
     output reg         busy,
     output reg         done,
     output reg         error,
-    inout  wire        scl_io,
-    inout  wire        sda_io,
+    input  wire        scl_i,
+    input  wire        sda_i,
+    output reg         scl_drive_low,
+    output reg         sda_drive_low,
     output wire [3:0]  status_led,
     output reg  [5:0]  dbg_fsm_state,
     output reg  [4:0]  dbg_bit_state,
@@ -88,8 +90,6 @@ module i2c_eeprom_master #(
     reg [15:0] clk_div_cnt = 16'd0;
     reg tick = 1'b0;
 
-    reg scl_drive_low = 1'b0;
-    reg sda_drive_low = 1'b0;
     wire scl_in;
     wire sda_in;
 
@@ -110,10 +110,8 @@ module i2c_eeprom_master #(
     reg [7:0]  ctrl_write_byte = 8'hA0;
     reg [7:0]  ctrl_read_byte = 8'hA1;
 
-    assign scl_io = scl_drive_low ? 1'b0 : 1'bz;
-    assign sda_io = sda_drive_low ? 1'b0 : 1'bz;
-    assign scl_in = scl_io;
-    assign sda_in = sda_io;
+    assign scl_in = scl_i;
+    assign sda_in = sda_i;
 
     assign dbg_scl_sample = scl_in;
     assign dbg_sda_sample = sda_in;

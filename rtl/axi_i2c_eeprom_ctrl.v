@@ -49,8 +49,12 @@ module axi_i2c_eeprom_ctrl #(
     output reg                               s_axi_rvalid,
     (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI RREADY" *)
     input  wire                              s_axi_rready,
-    inout  wire                              iic_scl,
-    inout  wire                              iic_sda,
+    input  wire                              iic_scl_i,
+    output wire                              iic_scl_o,
+    output wire                              iic_scl_t,
+    input  wire                              iic_sda_i,
+    output wire                              iic_sda_o,
+    output wire                              iic_sda_t,
     output wire [3:0]                        user_led,
     output wire [5:0]                        dbg_fsm_state,
     output wire [4:0]                        dbg_bit_state,
@@ -75,6 +79,13 @@ module axi_i2c_eeprom_ctrl #(
     wire core_done;
     wire core_error;
     wire [7:0] core_read_data;
+    wire scl_drive_low;
+    wire sda_drive_low;
+
+    assign iic_scl_o = 1'b0;
+    assign iic_scl_t = ~scl_drive_low;
+    assign iic_sda_o = 1'b0;
+    assign iic_sda_t = ~sda_drive_low;
 
     always @(posedge s_axi_aclk) begin
         if (!s_axi_aresetn) begin
@@ -166,8 +177,10 @@ module axi_i2c_eeprom_ctrl #(
         .busy(core_busy),
         .done(core_done),
         .error(core_error),
-        .scl_io(iic_scl),
-        .sda_io(iic_sda),
+        .scl_i(iic_scl_i),
+        .sda_i(iic_sda_i),
+        .scl_drive_low(scl_drive_low),
+        .sda_drive_low(sda_drive_low),
         .status_led(user_led),
         .dbg_fsm_state(dbg_fsm_state),
         .dbg_bit_state(dbg_bit_state),
