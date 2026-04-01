@@ -114,8 +114,8 @@ module axi_i2c_eeprom_ctrl #(
                             start_pulse <= 1'b1;
                         end
                     end
-                    4'h1: addr_reg <= s_axi_wdata;
-                    4'h2: write_reg <= s_axi_wdata;
+                    4'h2: addr_reg <= s_axi_wdata;
+                    4'h3: write_reg <= s_axi_wdata;
                     default: begin
                     end
                 endcase

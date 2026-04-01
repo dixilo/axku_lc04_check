@@ -1,7 +1,8 @@
 `timescale 1ns / 1ps
 
 module i2c_eeprom_master #(
-    parameter integer CLK_DIVIDER = 250
+    parameter integer CLK_DIVIDER    = 250,
+    parameter integer ACK_POLL_MAX   = 200
 ) (
     input  wire        clk,
     input  wire        rst,
@@ -60,6 +61,7 @@ module i2c_eeprom_master #(
     localparam [4:0]
         BIT_IDLE         = 5'd0,
         BIT_START_A      = 5'd1,
+        BIT_START_HOLD   = 5'd19,  // extra tick: SCL=1, SDA=1 to meet tSU;STA / tBUF >= 4.7us
         BIT_START_B      = 5'd2,
         BIT_START_C      = 5'd3,
         BIT_STOP_A       = 5'd4,
@@ -173,6 +175,10 @@ module i2c_eeprom_master #(
                     BIT_START_A: begin
                         scl_drive_low <= 1'b0;
                         sda_drive_low <= 1'b0;
+                        bit_state <= BIT_START_HOLD;
+                    end
+                    BIT_START_HOLD: begin
+                        // SCL=1, SDA=1 for one extra tick to satisfy tSU;STA / tBUF (>= 4.7us)
                         bit_state <= BIT_START_B;
                     end
                     BIT_START_B: begin
@@ -482,10 +488,16 @@ module i2c_eeprom_master #(
 
                 HL_ACK_START_ISSUE: begin
                     if (!bit_busy) begin
-                        dbg_ack_poll_count <= dbg_ack_poll_count + 16'd1;
-                        bit_cmd <= CMD_START;
-                        bit_req <= 1'b1;
-                        hl_state <= HL_ACK_START_WAIT;
+                        if (dbg_ack_poll_count >= ACK_POLL_MAX[15:0]) begin
+                            error <= 1'b1;
+                            dbg_ack_poll_active <= 1'b0;
+                            hl_state <= HL_ERROR;
+                        end else begin
+                            dbg_ack_poll_count <= dbg_ack_poll_count + 16'd1;
+                            bit_cmd <= CMD_START;
+                            bit_req <= 1'b1;
+                            hl_state <= HL_ACK_START_WAIT;
+                        end
                     end
                 end
 

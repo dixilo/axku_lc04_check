@@ -72,7 +72,13 @@ static int read_hex_number(unsigned int *value)
         return XST_FAILURE;
     }
 
-    for (idx = 0; buf[idx] != '\0'; ++idx) {
+    /* skip optional "0x" / "0X" prefix */
+    int start_idx = 0;
+    if (idx >= 2 && buf[0] == '0' && (buf[1] == 'x' || buf[1] == 'X')) {
+        start_idx = 2;
+    }
+
+    for (idx = start_idx; buf[idx] != '\0'; ++idx) {
         char ch = buf[idx];
         result <<= 4;
         if (ch >= '0' && ch <= '9') {
